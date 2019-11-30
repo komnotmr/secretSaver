@@ -4,49 +4,56 @@
     <!-- <script data-main="js/main.js" src="thirdParty/require.js"></script>-->
     <script src="../static/thirdParty/knockout-3.5.1.js"></script>
     <script src="../static/thirdParty/jquery-3.4.1.min.js"></script>
+    <!--<script src="../static/thirdParty/bootstrap/bootstrap.js"></script>-->
+    <script src="../static/js/model.js"></script>
     <script src="../static/js/main.js"></script>
     <link href="../static/css/bootstrap/bootstrap.min.css" rel="stylesheet">
 </head>
 
 <body onload="init()" class="bg-light container">
-
-    <div class="row">
-        <div class="offset-md-4 col-md-4 center border-bottom">
+    <!-- Title start-->
+    <div class="row d-flex justify-content-center">
+        <div class="center-block border-bottom">
             <h3 class="text-center">
                 Ultra Saver Messages
             </h3>
         </div>
     </div>
-
+    <!-- Title end-->
     <br>
-    
-    <div class="row">
-        <div class="offset-md-4 col-md-4 center">
+    <!-- Container for input data -->
+    <div class="row d-flex justify-content-center">
+        <div class="center-block w-75">
             <div class="input-group">
                 <div class="input-group-prepend">
-                    <span class="input-group-text">Message:</span>
+                    <span class="input-group-text">Input:</span>
                 </div>
                 <textarea 
                     class="form-control" 
-                    data-bind="text: textMessage" 
+                    data-bind="textInput: data" 
                     aria-label="With textarea">
                 </textarea>
+                <input class="border" data-bind="value: lifeTime" type="date" />
             </div>
             <br>
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text" id="basic-addon1">Code:</span>
+            <!-- Alert box -->
+            <div class="row d-flex justify-content-center">
+                <div class="col-10">
+                    <div class="alert",
+                        data-bind="class: setAlertStyle">
+                        <p data-bind="text: alertMessage"></p>
+                    </div>
                 </div>
-                <input 
-                    type="text" 
-                    disabled 
-                    class="form-control" 
-                    data-bind="value: textCode"
-                    aria-label="Username" 
-                    aria-describedby="basic-addon1">
+                <!--Action button-->
+                <div class="col-2">
+                    <button type="button"
+                        class="float-right"
+                        data-bind="click: send, class: setButtonStyle"> Send
+                    </button>
+                </div>
             </div>
         </div>
-        <button type="button" onclick="sendMessage(this)" class="btn btn-dark">Send</button>
+        
     </div>
 </body>
 </html>
