@@ -40,7 +40,7 @@ class Model
         if (data.length === 0) 
             return false;
         //5b995439-bd77-4cd5-9408-7c7f55180c38
-        return /[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}/.test(data);
+        return /^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$/.test(data);
     }
     
     inputIsCorrect() {
@@ -55,6 +55,12 @@ class Model
         if (this.isCode()) 
             return true;
         // check lifeTime
+        if (this.lifeTime().length === 0) {
+            this.lifeTime(this.defaultLifeTime);
+            this.setSituation(2, 'Please, choice life time message');
+            return false;
+        }
+
         let d = Date.parse(this.lifeTime());
         if (d < Date.now()) {
                 if (d === this.defaultLifeTime)

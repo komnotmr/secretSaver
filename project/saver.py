@@ -2,7 +2,7 @@
 
 import sqlite3 #sqlite provider
 import uuid #generation unique id
-#from hashlib import blake2s
+import re # regular expressions
 
 tableName = 'messages'
 scripts = {
@@ -22,8 +22,19 @@ scripts = {
     ''',
     "dropTable": f'''
         DROP TABLE IF EXISTS {tableName} ;
+    ''',
+    "getRecord": f'''
+        SELECT * FROM {tableName}
+        WHERE code = ?;
     '''
 }
+# sqlite default returns tuple
+# for return dict use dict_factory
+def dict_factory(cursor, row):
+    d = {}
+    for idx, col in enumerate(cursor.description):
+        d[col[0]] = row[idx]
+    return d
 
 class Saver:
     # dbPath: text - path to database file
@@ -57,6 +68,7 @@ class Saver:
         # try connection 
         try:
             self._connection = sqlite3.connect(self._dbPath, check_same_thread = False)
+            self._connection.row_factory = dict_factory
         except:
             print('error: connect to dataBase')
         # creating cursor and creating table if not exists
@@ -78,8 +90,10 @@ class Saver:
     def _DropTable(self):
         self._cursor.execute(scripts["dropTable"])
 
-    def AddRecord(self, message, lifeTime):
+    def addRecord(self, message, lifeTime):
         try:
+            if not self._cursor:
+                self._Cursor()
             id = self._GenID()
             self._cursor.execute(scripts["addRecord"], [message, id, lifeTime])
             return id
@@ -87,6 +101,20 @@ class Saver:
             print('error: add record to table')
             return None
 
+    def isCode(self, code):
+        pttrn = re.compile('^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$')
+        return pttrn.match(code)
+
+    def getRecord(self, code):
+        try:
+            if not self._cursor:
+                self._Cursor()
+            res = self._cursor.execute(scripts["getRecord"], [code])
+            return res
+        except:
+            print('error: get record from table')
+            return None
+    
     def _ShowTable(self):
         res = self._cursor.execute(scripts["selectAll"])
         for row in res:
