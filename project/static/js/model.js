@@ -39,7 +39,7 @@ class Model
         let data = this.data().trim();
         if (data.length === 0) 
             return false;
-        //5b995439-bd77-4cd5-9408-7c7f55180c38
+        //key like xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
         return /^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$/.test(data);
     }
     
@@ -80,8 +80,7 @@ class Model
                 method: 'POST',
                 url: '/',
                 data: {
-                    data: self.data(),
-                    isCode: self.isCode(),
+                    data: self.isCode() ? self.data().trim() : self.data(),
                     lifeTime: self.lifeTime()
                 }
             }).done((msg)=>{

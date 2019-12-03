@@ -1,46 +1,46 @@
 #!/bin/python3
+#~server.py~
 from flask import Flask, request, render_template
-from saver import Saver
+from modules.saver import Saver
+from modules.brutSecure import BrutSecure
+from modules.answer import Answer
 
 app = Flask(__name__)
-s = Saver('test.db')
+dbSaver = Saver('./test.db')
+brutSecure = BrutSecure()
 
 @app.route('/', methods=['GET', 'POST'])
 def indexGet():
     if request.method == 'GET':
         return render_template('index.html')
     elif request.method == 'POST':
-        answer = {
-            "data": '',
-            "errors": []
-        }
-        print(f'server get data: {request.form}')
-        if not request.form:
-            print ('empty request')
-            answer["errors"].append('empty request')
-            return answer
-        if proccessInput(request.form, answer):
+        a = Answer()
+        if not brutSecure.Add(request.remote_addr):
+            if brutSecure.isBrut(request.remote_addr):
+                a.addError(f"banned for a {brutSecure.banTime.seconds} seconds")
+                return a.getAnswer()
+        if not request.form.get('data'):
+            a.addError('empty request')
+            return a.getAnswer()
+        if proccessInput(request.form, a):
             print ('valid data')
         else:
             print ('invalid data')
-            for e in answer['errors']:
-                print(e)
-        return answer    
+        return a.getAnswer()
 
-def proccessInput(req, answer):
+def proccessInput(req, a):
     # check message or code
-    if not req['data']:
-        answer["errors"].append('Input string is empty')
-    elif s.isCode(req['data']):
-        res = s.getRecord(req['data'])
+    if not req.get('data'):
+        a.addError('Input string is empty')
+    elif dbSaver.isCode(req['data']):
+        res = dbSaver.getRecord(req['data'])
         for r in res:
-            answer['data'] = r['message']
-        # else it just message and we check lifeTime
-    elif not req['lifeTime']:
-        answer["errors"].append('life time not chosen')
+            a.setData(r['message'])
+    elif not req.get('lifeTime'):
+        a.addError('life time not chosen')
     else:
-        answer['data'] = s.addRecord(req['data'], req['lifeTime'])
-    return len(answer["errors"]) > 0
+        a.setData(dbSaver._addRecord(req['data'], req['lifeTime']))
+    return a.isOk()
   
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', debug=True)
