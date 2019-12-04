@@ -9,9 +9,16 @@ class BrutSecure():
         self.deltaTime = timedelta(minutes=intervalTimeMinutes)
         self.limitRequests = maxRequests
         self.banTime = timedelta(minutes=banTimeMinutes)
+        self.enabled = False
     
     def _initIP(self):
         return [0, datetime.now()+self.deltaTime, self.delayed]
+
+    def disable(self):
+        self.enabled = False
+
+    def enable(self):
+        self.enabled = True
 
     def Add(self, ip):
         if not ip in self.ipTable.keys():
@@ -20,6 +27,8 @@ class BrutSecure():
         return False
     
     def isBrut(self, ip):
+        if not self.enabled:
+            return False
         if not ip in self.ipTable.keys():
             return False
         now = datetime.now()

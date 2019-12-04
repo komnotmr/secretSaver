@@ -8,6 +8,7 @@ from modules.answer import Answer
 app = Flask(__name__)
 dbSaver = Saver('./test.db')
 brutSecure = BrutSecure()
+brutSecure.enable()
 
 @app.route('/', methods=['GET', 'POST'])
 def indexGet():
