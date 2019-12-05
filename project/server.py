@@ -39,6 +39,8 @@ def setAnswer(req, a):
         res = dbSaver.getRecord(req['data'])
         for r in res:
             a.setData(r['message'])
+        if a.dataIsEmpty():
+            a.addError('Message not found')
     elif not req.get('lifeTime'):
         a.addError('life time not chosen')
     else:
@@ -46,4 +48,4 @@ def setAnswer(req, a):
     return a.isOk()
   
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True)
+    app.run(host='0.0.0.0')

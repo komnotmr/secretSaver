@@ -27,6 +27,9 @@ class Answer:
 
     def isOk(self):
         return len(self.__errors) == 0
+
+    def dataIsEmpty(self):
+        return len(self.__data) == 0
     
     def getAnswer(self):
         return {
