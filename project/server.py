@@ -1,12 +1,12 @@
 #!/bin/python3
 #~server.py~
 from flask import Flask, request, render_template
-from modules.saver import Saver
 from modules.brutSecure import BrutSecure
 from modules.answer import Answer
+from modules.saver import Saver
 
 app = Flask(__name__)
-dbSaver = Saver('./test.db')
+dbSaver = Saver('./test.db', removeIntervalMinutes=1)
 brutSecure = BrutSecure()
 brutSecure.enable()
 
@@ -20,17 +20,19 @@ def indexGet():
             if brutSecure.isBrut(request.remote_addr):
                 a.addError(f"banned for a {brutSecure.banTime.seconds} seconds")
                 return a.getAnswer()
+
         if not request.form.get('data'):
             a.addError('empty request')
             return a.getAnswer()
-        if proccessInput(request.form, a):
+
+        if setAnswer(request.form, a):
             print ('valid data')
         else:
             print ('invalid data')
+
         return a.getAnswer()
 
-def proccessInput(req, a):
-    # check message or code
+def setAnswer(req, a):
     if not req.get('data'):
         a.addError('Input string is empty')
     elif dbSaver.isCode(req['data']):

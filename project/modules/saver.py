@@ -49,24 +49,23 @@ def dict_factory(cursor, row):
 
 class Saver:
     # dbPath: text - path to database file
-    def __init__(self, dbPath):
+    def __init__(self, dbPath, removeIntervalMinutes=30):
         # check args
         if not type(dbPath) is str:
             raise TypeError('dbPath should be string')
+        self._pttrn = re.compile('^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$')
         self._initTime = datetime.now()
         self._gen = uuid
         self._cursor = None
         self._dbPath = dbPath
         self._connection = None
         self._Open()
-        self._intervalSchedule = timedelta(minutes=1)
+        self._intervalSchedule = timedelta(minutes=removeIntervalMinutes)
         self._scheduleThread = Thread(target=self._scheduleRemover)
         self._scheduleThread.daemon = True
         self.startSchedule()
-        
 
     def startSchedule(self):
-        print('started')
         self._scheduleThread.start()
 
     def _scheduleRemover(self):
@@ -74,7 +73,7 @@ class Saver:
             time.sleep(5)
             now = datetime.now()
             if now > self._initTime + self._intervalSchedule:
-                print('removing')
+                print('Saver: removing old records')
                 self.removeOldRecords()
                 self._initTime = now
 
@@ -118,7 +117,6 @@ class Saver:
         self._query("dropTable")
 
     def _query(self, methodName, *args):
-        print(methodName, *args)
         if not methodName:
             raise ValueError('methodName should be String')
         res = None
@@ -128,10 +126,8 @@ class Saver:
             res = self._cursor.execute(scripts[methodName], args)
         except DatabaseError as err:
             print(f'query error:', err)
-            wasErr = True
         except Exception as exc:
             print(f'query error:', exc)
-            wasErr = True
         else:
             self.Commit()
             return res
@@ -143,8 +139,7 @@ class Saver:
         return id
 
     def isCode(self, code):
-        pttrn = re.compile('^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$')
-        return pttrn.match(code)
+        return self._pttrn.match(code)
 
     def getRecord(self, code):
         return self._query("getRecord", code)
@@ -155,8 +150,3 @@ class Saver:
     def showTable(self):
         for row in self._query("selectAll"):
             print(row)
-
-if __name__ == '__main__':
-    s = Saver('../test.db')
-    time.sleep(180)
-    s.joinSchedule()

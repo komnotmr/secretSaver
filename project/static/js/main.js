@@ -12,7 +12,6 @@ require.config({
 
 require(['domReady!', 'knockout', 'model'],
 (doc, ko, Model) => {
-    console.log('inited');   
     ko.applyBindings(new Model());
 });
 

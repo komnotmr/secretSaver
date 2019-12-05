@@ -19,13 +19,13 @@ class BrutSecure():
 
     def enable(self):
         self.enabled = True
-
+    # ip: string - (request's address)
     def Add(self, ip):
         if not ip in self.ipTable.keys():
             self.ipTable[ip] = self._initIP()
             return True
         return False
-    
+    # ip: string - (request's address)
     def isBrut(self, ip):
         if not self.enabled:
             return False
@@ -42,6 +42,7 @@ class BrutSecure():
                 self.ipTable[ip][0] = 0
                 self.ipTable[ip][1] = now + self.banTime + self.deltaTime
                 self.ipTable[ip][2] = now + self.banTime
+                print(f'BrutSecure: ban ip addres {ip}, too many requests')
                 return True
             else:
                 self.ipTable[ip] = self._initIP()

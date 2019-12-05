@@ -75,7 +75,7 @@ define('model', ['jquery', 'knockout'],
 
             send() {
                 self = this;
-                if(!this.inputIsCorrect()) return;
+                if(!self.inputIsCorrect()) return;
                 $.ajax({
                         method: 'POST',
                         url: '/',
@@ -89,7 +89,7 @@ define('model', ['jquery', 'knockout'],
                             self.setSituation(2, msg.errors[0])
                         } else {
                             self.data(msg.data)
-                            self.setSituation(1, this.defaultAlert)
+                            self.setSituation(1, self.defaultAlert)
                         }
                     }).fail((jqXRH, textStatus)=>{
                         console.log(textStatus);
