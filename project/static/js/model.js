@@ -27,6 +27,20 @@ define('model', ['jquery', 'knockout'],
                 this.setButtonStyle = ko.pureComputed(()=>{
                     return `btn btn-${this.styleTypes[this.styleId()]}`;
                 });
+                this.dataLimit = 512;
+                this.dataLength = ko.pureComputed(()=>{
+                    return `${this.data().length/this.dataLimit * 100}%`;
+                });
+                this.dataColorLimit = ko.pureComputed(()=>{
+                    let len = this.data().length;
+                    if (len < this.dataLimit*0.25)
+                        return 'bg-success';
+                    if (len < this.dataLimit*0.50)
+                        return 'bg-info';
+                    if (len < this.dataLimit*0.75)
+                        return 'bg-warning';
+                    return 'bg-danger';
+                });
             }
             // setting alert and class types 
             setSituation(id, msg='') {
@@ -50,6 +64,10 @@ define('model', ['jquery', 'knockout'],
                     || this.data().trim().length === 0) {
                         this.setSituation(2, 'Input data is empty');
                 return false;
+                }
+                if (this.data().length > this.dataLimit) {
+                    this.setSituation(2, `Too long message, max length is ${this.dataLimit}`);
+                    return false;
                 }
                 // if data exists check that is code
                 // if this is message - check date else send code

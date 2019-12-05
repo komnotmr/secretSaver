@@ -10,6 +10,8 @@ dbSaver = Saver('./test.db', removeIntervalMinutes=1)
 brutSecure = BrutSecure()
 brutSecure.enable()
 
+DATA_LIMIT = 512 
+
 @app.route('/', methods=['GET', 'POST'])
 def indexGet():
     if request.method == 'GET':
@@ -44,8 +46,11 @@ def setAnswer(req, a):
     elif not req.get('lifeTime'):
         a.addError('life time not chosen')
     else:
-        a.setData(dbSaver._addRecord(req['data'], req['lifeTime']))
+        if len(req['data']) > DATA_LIMIT:
+            a.addError(f'Too long message, max length is {DATA_LIMIT}')
+        else:
+            a.setData(dbSaver._addRecord(req['data'], req['lifeTime']))
     return a.isOk()
   
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0', debug=True)
