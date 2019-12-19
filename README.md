@@ -1,6 +1,6 @@
 # SecretSaver
 ### Установка
-Для работы сервера необходимы [Python3](https://www.python.org/) и [Flask](https://www.palletsprojects.com/p/flask/):
+Для работы сервера необходимы [Python3.8.x](https://www.python.org/) и [Flask](https://www.palletsprojects.com/p/flask/):
 
 **Пример установки пакета с помощью pip**
 ```sh
